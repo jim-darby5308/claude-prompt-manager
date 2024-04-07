@@ -3,11 +3,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === 'applyPrompt') {
     const promptText = request.promptText;
     const lines = promptText.split('\n');
-    const editableDiv = document.querySelector('div[contenteditable="true"]');
-    if (editableDiv) {
+    const editableDivs = document.querySelectorAll('div[contenteditable="true"]');
+    if (editableDivs.length > 0) {
+      const lastEditableDiv = editableDivs[editableDivs.length - 1];
       // Clear existing content
-      while (editableDiv.firstChild) {
-        editableDiv.removeChild(editableDiv.firstChild);
+      while (lastEditableDiv.firstChild) {
+        lastEditableDiv.removeChild(lastEditableDiv.firstChild);
       }
       lines.forEach((line, index) => {
         const p = document.createElement('p');
@@ -19,11 +20,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
           const textNode = document.createTextNode(line);
           p.appendChild(textNode);
         }
-        editableDiv.appendChild(p);
+        lastEditableDiv.appendChild(p);
       });
-      editableDiv.focus(); // カーソルをdivの最後に移動
+      lastEditableDiv.focus(); // カーソルをdivの最後に移動
       const range = document.createRange();
-      range.selectNodeContents(editableDiv);
+      range.selectNodeContents(lastEditableDiv);
       range.collapse(false);
       const selection = window.getSelection();
       selection.removeAllRanges();
