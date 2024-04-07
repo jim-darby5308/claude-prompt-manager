@@ -58,5 +58,13 @@
   "managePrompts": {
     "message": "プロンプトの管理",
     "description": "プロンプト管理ボタンのテキスト"
+  },
+  "edit": {
+    "message": "編集",
+    "description": "編集ボタンのテキスト"
+  },
+  "delete": {
+    "message": "削除",
+    "description": "削除ボタンのテキスト"
   }
 }

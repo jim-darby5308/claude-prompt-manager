@@ -10,13 +10,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ローカルストレージからプロンプトを読み込み、ドロップダウンリストに追加する関数
   function loadPrompts() {
-    promptSelect.innerHTML = '';
+    while (promptSelect.firstChild) {
+      promptSelect.removeChild(promptSelect.firstChild);
+    }
     chrome.storage.local.get(null, function(data) {
       for (const key in data) {
         const option = document.createElement('option');
         option.value = key;
         option.text = key;
-        promptSelect.add(option);
+        promptSelect.appendChild(option);
       }
       // プロンプトが選択された時のプレビュー更新処理を追加
       promptSelect.addEventListener('change', updatePreview);
@@ -46,13 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // プロンプトプレビューを更新する関数を追加
   function updatePreview() {
     const selectedPrompt = promptSelect.value;
+    while (promptPreview.firstChild) {
+      promptPreview.removeChild(promptPreview.firstChild);
+    }
     if (selectedPrompt) {
       chrome.storage.local.get(selectedPrompt, function(data) {
-        const previewText = data[selectedPrompt].replace(/\n/g, '<br>');
-        promptPreview.innerHTML = previewText;
+        const previewText = data[selectedPrompt];
+        const previewTextNode = document.createTextNode(previewText);
+        promptPreview.appendChild(previewTextNode);
       });
-    } else {
-      promptPreview.textContent = '';
     }
   }
 

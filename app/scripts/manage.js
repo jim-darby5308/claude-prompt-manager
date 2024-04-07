@@ -16,15 +16,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ローカルストレージからプロンプトを読み込み、一覧表示する関数
   function loadPrompts() {
-    promptList.innerHTML = '';
+    while (promptList.firstChild) {
+      promptList.removeChild(promptList.firstChild);
+    }
     chrome.storage.local.get(null, function(data) {
       for (const key in data) {
         const listItem = document.createElement('li');
-        listItem.innerHTML = `
-          <span>${key}</span>
-          <button class="edit-button" data-prompt="${key}">Edit</button>
-          <button class="delete-button" data-prompt="${key}">Delete</button>
-        `;
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = key;
+        const editButton = document.createElement('button');
+        editButton.classList.add('edit-button');
+        editButton.dataset.prompt = key;
+        editButton.textContent = chrome.i18n.getMessage('edit');
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-button');
+        deleteButton.dataset.prompt = key;
+        deleteButton.textContent = chrome.i18n.getMessage('delete');
+        listItem.appendChild(nameSpan);
+        listItem.appendChild(editButton);
+        listItem.appendChild(deleteButton);
         promptList.appendChild(listItem);
       }
     });

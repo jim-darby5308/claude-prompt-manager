@@ -58,5 +58,13 @@
   "managePrompts": {
     "message": "Manage Prompts",
     "description": "Text for the manage prompts button"
+  },
+  "edit": {
+    "message": "Edit",
+    "description": "Text for the edit button"
+  },
+  "delete": {
+    "message": "Delete",
+    "description": "Text for the delete button"
   }
 }
