@@ -37,7 +37,6 @@ body {
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 10px;
-  margin-bottom: 20px;
   min-height: 100px;
   white-space: pre-wrap;
 }
@@ -63,4 +62,5 @@ body {
 .button-group {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 20px;
 }

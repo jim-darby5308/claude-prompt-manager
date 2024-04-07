@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.storage.local.set({ [promptName]: promptText }, function() {
         promptNameInput.value = '';
         promptTextInput.value = '';
-        loadPrompts();
+        // ページをリロードしてプロンプトリストを更新
+        location.reload();
       });
     }
   }
