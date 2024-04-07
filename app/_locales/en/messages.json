@@ -1,0 +1,62 @@
+{
+  "appName": {
+    "message": "Claude Prompt Manager",
+    "description": "The name of the application"
+  },
+  "appShortName": {
+    "message": "ClaudePM",
+    "description": "The short_name (maximum of 12 characters recommended) is a short version of the app's name."
+  },
+  "appDescription": {
+    "message": "A browser extension to manage and apply prompts for Claude.",
+    "description": "The description of the application"
+  },
+  "browserActionTitle": {
+    "message": "Claude Prompt Manager",
+    "description": "The title of the browser action button"
+  },
+  "manageTitle": {
+    "message": "Manage Prompts",
+    "description": "Title for the manage prompts page"
+  },
+  "promptName": {
+    "message": "Prompt Name:",
+    "description": "Label for prompt name input"
+  },
+  "promptText": {
+    "message": "Prompt Text:",
+    "description": "Label for prompt text input"
+  },
+  "savePrompt": {
+    "message": "Save Prompt",
+    "description": "Text for the save prompt button"
+  },
+  "import": {
+    "message": "Import",
+    "description": "Text for the import button"
+  },
+  "export": {
+    "message": "Export",
+    "description": "Text for the export button"
+  },
+  "close": {
+    "message": "Close",
+    "description": "Text for the close button"
+  },
+  "popupTitle": {
+    "message": "Claude Prompt Manager",
+    "description": "Title for the popup page"
+  },
+  "selectPrompt": {
+    "message": "Select Prompt:",
+    "description": "Label for the prompt select dropdown"
+  },
+  "apply": {
+    "message": "Apply",
+    "description": "Text for the apply button"
+  },
+  "managePrompts": {
+    "message": "Manage Prompts",
+    "description": "Text for the manage prompts button"
+  }
+}

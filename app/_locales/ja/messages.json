@@ -1,0 +1,62 @@
+{
+  "appName": {
+    "message": "Claude プロンプトマネージャー",
+    "description": "アプリケーションの名前"
+  },
+  "appShortName": {
+    "message": "ClaudePM",
+    "description": "アプリの短縮名(最大12文字推奨)"
+  },
+  "appDescription": {
+    "message": "Claude 用のプロンプトを管理・適用するブラウザ拡張機能。",
+    "description": "アプリケーションの説明"
+  },
+  "browserActionTitle": {
+    "message": "Claude プロンプトマネージャー",
+    "description": "ブラウザアクションボタンのタイトル"
+  },
+  "manageTitle": {
+    "message": "プロンプトの管理",
+    "description": "プロンプト管理ページのタイトル"
+  },
+  "promptName": {
+    "message": "プロンプト名:",
+    "description": "プロンプト名入力のラベル"
+  },
+  "promptText": {
+    "message": "プロンプトテキスト:",
+    "description": "プロンプトテキスト入力のラベル"
+  },
+  "savePrompt": {
+    "message": "プロンプトを保存",
+    "description": "プロンプト保存ボタンのテキスト"
+  },
+  "import": {
+    "message": "インポート",
+    "description": "インポートボタンのテキスト"
+  },
+  "export": {
+    "message": "エクスポート",
+    "description": "エクスポートボタンのテキスト"
+  },
+  "close": {
+    "message": "閉じる",
+    "description": "閉じるボタンのテキスト"
+  },
+  "popupTitle": {
+    "message": "Claude プロンプトマネージャー",
+    "description": "ポップアップページのタイトル"
+  },
+  "selectPrompt": {
+    "message": "プロンプトを選択:",
+    "description": "プロンプト選択ドロップダウンのラベル"
+  },
+  "apply": {
+    "message": "適用",
+    "description": "適用ボタンのテキスト"
+  },
+  "managePrompts": {
+    "message": "プロンプトの管理",
+    "description": "プロンプト管理ボタンのテキスト"
+  }
+}

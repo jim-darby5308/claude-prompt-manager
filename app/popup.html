@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Claude Prompt Manager</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="stylesheet" href="styles/popup.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 class="title" data-i18n="popupTitle">Claude Prompt Manager</h1>
+    <div class="prompt-select">
+      <label for="prompt-select" data-i18n="selectPrompt">Select Prompt:</label>
+      <select id="prompt-select">
+      </select>
+    </div>
+    <div id="prompt-preview" class="prompt-preview">
+    </div>
+    <div class="button-group">
+      <button id="apply-button" class="btn-primary" data-i18n="apply">Apply</button>
+      <button id="manage-button" class="btn-secondary" data-i18n="managePrompts">Manage Prompts</button>
+    </div>
+  </div>
+  <script src="scripts/popup.js"></script>
+</body>
+</html>
