@@ -66,5 +66,13 @@
   "delete": {
     "message": "削除",
     "description": "削除ボタンのテキスト"
+  },
+  "copy": {
+    "message": "コピー",
+    "description": "コピーボタンのテキスト"
+  },
+  "promptCopied": {
+    "message": "プロンプトがクリップボードにコピーされました！",
+    "description": "プロンプトのクリップボードへのコピーが成功した際に表示されるメッセージ"
   }
 }

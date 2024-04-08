@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const promptSelect = document.getElementById('prompt-select');
   const promptPreview = document.getElementById('prompt-preview');
   const applyButton = document.getElementById('apply-button');
+  const copyButton = document.getElementById('copy-button');
   const manageButton = document.getElementById('manage-button');
 
   // Localize UI
@@ -40,6 +41,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // プロンプトプレビューをコピーする関数を追加
+  function copyPrompt() {
+    const selectedPrompt = promptSelect.value;
+    if (selectedPrompt) {
+      chrome.storage.local.get(selectedPrompt, function(data) {
+        const promptText = data[selectedPrompt];
+        navigator.clipboard.writeText(promptText).then(function() {
+          console.log('Prompt copied to clipboard');
+          showCopyNotification();
+        }, function(err) {
+          console.error('Could not copy prompt: ', err);
+        });
+      });
+    }
+  }
+
+  function showCopyNotification() {
+    const notification = document.createElement('div');
+    notification.textContent = chrome.i18n.getMessage('promptCopied');
+    notification.classList.add('copy-notification');
+    document.body.appendChild(notification);
+  
+    setTimeout(function() {
+      notification.style.opacity = '0';
+      setTimeout(function() {
+        notification.remove();
+      }, 500);
+    }, 1500);
+  }
+
   // プロンプト管理画面に遷移する関数
   function openManagementPage() {
     chrome.tabs.create({ url: 'manage.html' });
@@ -62,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // イベントリスナーの登録
   applyButton.addEventListener('click', applyPrompt);
+  copyButton.addEventListener('click', copyPrompt);
   manageButton.addEventListener('click', openManagementPage);
 
   // 初期化処理

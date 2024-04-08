@@ -66,5 +66,13 @@
   "delete": {
     "message": "Delete",
     "description": "Text for the delete button"
+  },
+  "copy": {
+    "message": "Copy",
+    "description": "Text for the copy button"
+  },
+  "promptCopied": {
+    "message": "Prompt copied to clipboard!",
+    "description": "Message shown when a prompt is successfully copied to clipboard"
   }
 }

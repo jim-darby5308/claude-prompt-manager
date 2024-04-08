@@ -31,6 +31,31 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.prompt-list li span {
+  flex-grow: 1;
+}
+
+.prompt-list li .button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-button,
+.delete-button {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  background-color: #e0e0e0;
+}
+
 .prompt-form {
   background-color: #fff;
   border-radius: 4px;
@@ -47,11 +72,12 @@ body {
 
 .prompt-form input[type="text"],
 .prompt-form textarea {
-  width: 100%;
+  width: calc(100% - 20px);
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+  margin-right: 20px;
 }
 
 .btn-primary {

@@ -2,7 +2,7 @@
   "name": "Claude Prompt Manager",
   "short_name": "ClaudePM",
   "description": "A browser extension to manage and apply prompts for Claude.",
-  "version": "1.0.4",
+  "version": "1.1.1",
   "manifest_version": 2,
   "default_locale": "en",
   "icons": {

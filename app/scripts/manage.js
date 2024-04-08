@@ -24,17 +24,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const listItem = document.createElement('li');
         const nameSpan = document.createElement('span');
         nameSpan.textContent = key;
+  
+        const buttonGroup = document.createElement('div');
+        buttonGroup.classList.add('button-group');
+  
         const editButton = document.createElement('button');
         editButton.classList.add('edit-button');
         editButton.dataset.prompt = key;
         editButton.textContent = chrome.i18n.getMessage('edit');
+  
         const deleteButton = document.createElement('button');
         deleteButton.classList.add('delete-button');
         deleteButton.dataset.prompt = key;
         deleteButton.textContent = chrome.i18n.getMessage('delete');
+  
+        buttonGroup.appendChild(editButton);
+        buttonGroup.appendChild(deleteButton);
+  
         listItem.appendChild(nameSpan);
-        listItem.appendChild(editButton);
-        listItem.appendChild(deleteButton);
+        listItem.appendChild(buttonGroup);
         promptList.appendChild(listItem);
       }
     });
