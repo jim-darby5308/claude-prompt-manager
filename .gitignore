@@ -3,4 +3,5 @@ dist/
 packages/
 /*.zip
 /*.xml
+/*_xml.txt
 /*.xpi

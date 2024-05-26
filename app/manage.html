@@ -8,19 +8,37 @@
 <body>
   <div class="container">
     <h1 class="title" data-i18n="manageTitle">Manage Prompts</h1>
-    <ul class="prompt-list" id="prompt-list">
-    </ul>
+    <div class="prompt-select">
+      <label for="prompt-select" data-i18n="selectPrompt">Select Prompt:</label>
+    <div class="prompt-select-container">
+      <select id="prompt-select"></select>
+      <button id="add-prompt-button" class="add-prompt-button" data-i18n-title="addPrompt">+</button>
+    </div>
+    </div>
     <form id="prompt-form" class="prompt-form">
       <label for="prompt-name" data-i18n="promptName">Prompt Name:</label>
       <input type="text" id="prompt-name" name="prompt-name" required>
       <label for="prompt-text" data-i18n="promptText">Prompt Text:</label>
       <textarea id="prompt-text" name="prompt-text" rows="4" required></textarea>
-      <button type="submit" class="btn-primary" data-i18n="savePrompt">Save Prompt</button>
+      <div class="button-group primary-actions">
+        <button type="button" id="save-button" class="btn-primary" data-i18n="savePrompt">Save Prompt</button>
+        <button type="button" id="delete-button" class="btn-secondary" data-i18n="deletePrompt">Delete Prompt</button>
+      </div>
     </form>
-    <div class="button-group">
+    <div class="button-group secondary-actions">
       <button id="import-button" class="btn-secondary" data-i18n="import">Import</button>
       <button id="export-button" class="btn-secondary" data-i18n="export">Export</button>
+      <button id="reorder-button" class="btn-secondary" data-i18n="reorderPrompts">Reorder Prompts</button>
       <button id="close-button" class="btn-secondary" data-i18n="close">Close</button>
+    </div>
+  </div>
+  <div id="confirmation-dialog" class="dialog">
+    <div class="dialog-content">
+      <p data-i18n="deleteConfirmation">Are you sure you want to delete this prompt?</p>
+      <div class="dialog-buttons">
+        <button id="ok-button" class="btn-primary" data-i18n="ok">OK</button>
+        <button id="cancel-button" class="btn-secondary" data-i18n="cancel">Cancel</button>
+      </div>
     </div>
   </div>
   <script src="scripts/manage.js"></script>

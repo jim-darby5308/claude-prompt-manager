@@ -59,11 +59,7 @@
     "message": "プロンプトの管理",
     "description": "プロンプト管理ボタンのテキスト"
   },
-  "edit": {
-    "message": "編集",
-    "description": "編集ボタンのテキスト"
-  },
-  "delete": {
+  "deletePrompt": {
     "message": "削除",
     "description": "削除ボタンのテキスト"
   },
@@ -74,5 +70,37 @@
   "promptCopied": {
     "message": "プロンプトがクリップボードにコピーされました！",
     "description": "プロンプトのクリップボードへのコピーが成功した際に表示されるメッセージ"
+  },
+  "promptSaved": {
+    "message": "プロンプトを保存しました！",
+    "description": "プロンプトの保存時に表示されるメッセージ"
+  },
+  "deleteConfirmation": {
+    "message": "本当にこのプロンプトを削除しますか？",
+    "description": "プロンプト削除の確認メッセージ"
+  },
+  "ok": {
+    "message": "OK",
+    "description": "OKボタンのテキスト"
+  },
+  "cancel": {
+    "message": "キャンセル",
+    "description": "キャンセルボタンのテキスト"
+  },
+    "addPrompt": {
+    "message": "プロンプトを追加",
+    "description": "プロンプト追加ボタンのタイトル"
+  },
+    "reorderPrompts": {
+    "message": "プロンプトの並び替え",
+    "description": "プロンプト並び替えボタンのテキスト"
+  },
+  "reorderTitle": {
+    "message": "プロンプトの並び替え",
+    "description": "プロンプト並び替えページのタイトル"
+  },
+  "saveOrder": {
+    "message": "並び順を保存",
+    "description": "並び順保存ボタンのテキスト"
   }
 }

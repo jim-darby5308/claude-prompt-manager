@@ -14,13 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
     while (promptSelect.firstChild) {
       promptSelect.removeChild(promptSelect.firstChild);
     }
-    chrome.storage.local.get(null, function(data) {
-      for (const key in data) {
+    chrome.storage.local.get('prompts', function(data) {
+      const prompts = data.prompts || [];
+      prompts.forEach(function(prompt) {
         const option = document.createElement('option');
-        option.value = key;
-        option.text = key;
+        option.value = prompt.promptName;
+        option.text = prompt.promptName;
         promptSelect.appendChild(option);
-      }
+      });
       // プロンプトが選択された時のプレビュー更新処理を追加
       promptSelect.addEventListener('change', updatePreview);
       // 初期表示時にプレビューを更新
@@ -32,11 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function applyPrompt() {
     const selectedPrompt = promptSelect.value;
     if (selectedPrompt) {
-      chrome.storage.local.get(selectedPrompt, function(data) {
-        const promptText = data[selectedPrompt];
-        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, { action: 'applyPrompt', promptText: promptText });
-        });
+      chrome.storage.local.get('prompts', function(data) {
+        const prompts = data.prompts || [];
+        const prompt = prompts.find(p => p.promptName === selectedPrompt);
+        if (prompt) {
+          const promptText = prompt.promptValue;
+          chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'applyPrompt', promptText: promptText });
+          });
+        }
       });
     }
   }
@@ -45,14 +50,18 @@ document.addEventListener('DOMContentLoaded', function() {
   function copyPrompt() {
     const selectedPrompt = promptSelect.value;
     if (selectedPrompt) {
-      chrome.storage.local.get(selectedPrompt, function(data) {
-        const promptText = data[selectedPrompt];
-        navigator.clipboard.writeText(promptText).then(function() {
-          console.log('Prompt copied to clipboard');
-          showCopyNotification();
-        }, function(err) {
-          console.error('Could not copy prompt: ', err);
-        });
+      chrome.storage.local.get('prompts', function(data) {
+        const prompts = data.prompts || [];
+        const prompt = prompts.find(p => p.promptName === selectedPrompt);
+        if (prompt) {
+          const promptText = prompt.promptValue;
+          navigator.clipboard.writeText(promptText).then(function() {
+            console.log('Prompt copied to clipboard');
+            showCopyNotification();
+          }, function(err) {
+            console.error('Could not copy prompt: ', err);
+          });
+        }
       });
     }
   }
@@ -83,10 +92,14 @@ document.addEventListener('DOMContentLoaded', function() {
       promptPreview.removeChild(promptPreview.firstChild);
     }
     if (selectedPrompt) {
-      chrome.storage.local.get(selectedPrompt, function(data) {
-        const previewText = data[selectedPrompt];
-        const previewTextNode = document.createTextNode(previewText);
-        promptPreview.appendChild(previewTextNode);
+      chrome.storage.local.get('prompts', function(data) {
+        const prompts = data.prompts || [];
+        const prompt = prompts.find(p => p.promptName === selectedPrompt);
+        if (prompt) {
+          const previewText = prompt.promptValue;
+          const previewTextNode = document.createTextNode(previewText);
+          promptPreview.appendChild(previewTextNode);
+        }
       });
     }
   }

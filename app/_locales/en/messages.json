@@ -59,11 +59,7 @@
     "message": "Manage Prompts",
     "description": "Text for the manage prompts button"
   },
-  "edit": {
-    "message": "Edit",
-    "description": "Text for the edit button"
-  },
-  "delete": {
+  "deletePrompt": {
     "message": "Delete",
     "description": "Text for the delete button"
   },
@@ -74,5 +70,37 @@
   "promptCopied": {
     "message": "Prompt copied to clipboard!",
     "description": "Message shown when a prompt is successfully copied to clipboard"
+  },
+  "promptSaved": {
+    "message": "Prompt saved!",
+    "description": "Message shown when a prompt is successfully saved to storage"
+  },
+  "deleteConfirmation": {
+    "message": "Are you sure you want to delete this prompt?",
+    "description": "Confirmation message for deleting a prompt"
+  },
+  "ok": {
+    "message": "OK",
+    "description": "Text for the OK button"
+  },
+  "cancel": {
+    "message": "Cancel",
+    "description": "Text for the Cancel button"
+  },
+  "addPrompt": {
+    "message": "Add Prompt",
+    "description": "Title for the add prompt button"
+  },
+  "reorderPrompts": {
+    "message": "Reorder Prompts",
+    "description": "Text for the reorder prompts button"
+  },
+  "reorderTitle": {
+    "message": "Reorder Prompts",
+    "description": "Title for the reorder prompts page"
+  },
+  "saveOrder": {
+    "message": "Save Order",
+    "description": "Text for the save order button"
   }
 }
