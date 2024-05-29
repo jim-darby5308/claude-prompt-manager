@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Manage Prompts</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="stylesheet" href="styles/taggle.css" />
+  <link rel="stylesheet" href="styles/awesomplete.css" />
   <link rel="stylesheet" href="styles/manage.css" />
 </head>
 <body>
@@ -17,7 +20,13 @@
     </div>
     <form id="prompt-form" class="prompt-form">
       <label for="prompt-name" data-i18n="promptName">Prompt Name:</label>
-      <input type="text" id="prompt-name" name="prompt-name" required>
+      <div class="prompt-name-container">  
+        <input type="text" id="prompt-name" name="prompt-name" tabindex="0" required>
+        <label for="enable-checkbox" data-i18n="enable">Enable:</label>
+        <input type="checkbox" id="enable-checkbox" name="enable-checkbox" tabindex="0" checked>
+      </div>
+      <label for="tag-input" data-i18n="tags">Tags:</label>
+      <div id="tag-input"></div>
       <label for="prompt-text" data-i18n="promptText">Prompt Text:</label>
       <textarea id="prompt-text" name="prompt-text" rows="4" required></textarea>
       <div class="button-group primary-actions">

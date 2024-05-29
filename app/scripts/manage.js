@@ -1,7 +1,8 @@
+import Taggle from 'taggle';
+import Awesomplete from 'awesomplete';
 document.addEventListener('DOMContentLoaded', function() {
   const promptSelectElement = document.getElementById('prompt-select');
   const addPromptButton = document.getElementById('add-prompt-button');
-  const promptFormElement = document.getElementById('prompt-form');
   const promptNameInput = document.getElementById('prompt-name');
   const promptTextInput = document.getElementById('prompt-text');
   const saveButton = document.getElementById('save-button');
@@ -13,6 +14,20 @@ document.addEventListener('DOMContentLoaded', function() {
   const confirmationDialog = document.getElementById('confirmation-dialog');
   const okButton = document.getElementById('ok-button');
   const cancelButton = document.getElementById('cancel-button');
+  const enableInput = document.getElementById('enable-checkbox');
+
+  // タグ入力の初期化
+  const taggle = new Taggle('tag-input', {
+    duplicateTagClass: 'bounce',
+    additionalTagClasses: ['taggle-tag']
+  });
+  
+  // オートコンプリートの初期化
+  const awesomplete = new Awesomplete(taggle.getInput(), {
+    list: [],
+    autoFirst: false,
+    minChars: 1
+  });
 
   // Localize UI
   localizeUI();
@@ -47,6 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
     promptNameInput.value = '';
     promptTextInput.value = '';
     promptNameInput.focus();
+    enableInput.checked = true;
+    updateTaggle([]); // タグをクリア
   }
 
   // 選択されたプロンプトでフォームを更新する関数
@@ -59,12 +76,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedPromptData) {
           promptNameInput.value = selectedPromptData.promptName;
           promptTextInput.value = selectedPromptData.promptValue;
+          enableInput.checked = selectedPromptData.enable !== false; // デフォルトはtrue
+          updateTaggle(selectedPromptData.tags || []); // タグを更新
           adjustTextareaHeight();
         }
       });
     } else {
       promptNameInput.value = '';
       promptTextInput.value = '';
+      enableInput.checked = true;
+      updateTaggle([]); // タグをクリア
       adjustTextareaHeight();
     }
   }
@@ -73,22 +94,30 @@ document.addEventListener('DOMContentLoaded', function() {
   function savePrompt() {
     const promptName = promptNameInput.value.trim();
     const promptText = promptTextInput.value.trim();
+    const enable = enableInput.checked;
+    const tags = Array.from(taggle.getTagValues()); // タグを取得
     if (promptName && promptText) {
-      chrome.storage.local.get('prompts', function(data) {
+      chrome.storage.local.get(['prompts', 'tags'], function(data) {
         const prompts = data.prompts || [];
+        const storedTags = data.tags || [];
         const index = prompts.findIndex(prompt => prompt.promptName === promptName);
         if (index !== -1) {
           prompts[index].promptValue = promptText;
+          prompts[index].enable = enable;
+          prompts[index].tags = tags;
         } else {
-          prompts.push({ promptName, promptValue: promptText });
+          prompts.push({ promptName, promptValue: promptText, enable, tags });
         }
-        chrome.storage.local.set({ prompts }, function() {
+        const updatedTags = new Set([...storedTags, ...tags]);
+        chrome.storage.local.set({ prompts, tags: Array.from(updatedTags) }, function() {
           // プロンプトリストを更新
           loadPrompts().then(() => {
             // 保存したプロンプトを選択
             promptSelectElement.value = promptName;
             // フォームを更新
             promptSelectElement.dispatchEvent(new Event('change'));
+            // オートコンプリートの候補を更新
+            awesomplete.list = Array.from(updatedTags);
             showSaveNotification();
           });
         });
@@ -164,14 +193,37 @@ document.addEventListener('DOMContentLoaded', function() {
           const jsonData = JSON.parse(reader.result);
           if (Array.isArray(jsonData)) {
             // 新データ形式の場合
-            chrome.storage.local.set({ prompts: jsonData }, function() {
-              loadPrompts();
+            const importedPrompts = jsonData;
+            const importedTags = new Set();
+            importedPrompts.forEach(prompt => {
+              if (Array.isArray(prompt.tags)) {
+                prompt.tags.forEach(tag => importedTags.add(tag));
+              }
+            });
+            chrome.storage.local.get(['prompts', 'tags'], function(data) {
+              const prompts = data.prompts || [];
+              const tags = data.tags || [];
+              const mergedPrompts = [...prompts, ...importedPrompts];
+              const mergedTags = Array.from(new Set([...tags, ...importedTags]));
+              chrome.storage.local.set({ prompts: mergedPrompts, tags: mergedTags }, function() {
+                loadPrompts();
+                awesomplete.list = mergedTags;
+              });
             });
           } else if (typeof jsonData === 'object') {
             // 旧データ形式の場合
-            const prompts = Object.entries(jsonData).map(([promptName, promptValue]) => ({ promptName, promptValue }));
-            chrome.storage.local.set({ prompts }, function() {
-              loadPrompts();
+            const importedPrompts = Object.entries(jsonData).map(([promptName, promptValue]) => ({ 
+              promptName, 
+              promptValue,
+              tags: [],
+              enable: true
+            }));
+            chrome.storage.local.get('prompts', function(data) {
+              const prompts = data.prompts || [];
+              const mergedPrompts = [...prompts, ...importedPrompts];
+              chrome.storage.local.set({ prompts: mergedPrompts }, function() {
+                loadPrompts();
+              });
             });
           } else {
             console.error('Invalid JSON data format');
@@ -198,8 +250,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const textareaRect = promptTextInput.getBoundingClientRect();
     const primaryButtonGroupRect = document.querySelector('.button-group.primary-actions').getBoundingClientRect();
     const secondaryButtonGroupRect = document.querySelector('.button-group.secondary-actions').getBoundingClientRect();
-    maxHeight = window.innerHeight - textareaRect.top - (primaryButtonGroupRect.height + 50) - (secondaryButtonGroupRect.height + 50);
+    const maxHeight = window.innerHeight - textareaRect.top - (primaryButtonGroupRect.height + 50) - (secondaryButtonGroupRect.height + 50);
     promptTextInput.style.height = `${Math.min(promptTextInput.scrollHeight, maxHeight)}px`;
+  }
+
+  // Taggleのタグを更新する関数
+  function updateTaggle(tags) {
+    taggle.removeAll();
+    tags.forEach(tag => taggle.add(tag));
+  }
+  
+  // Taggleの入力をAwesompleteと連動させる関数
+  function linkTaggleAndAwesomplete() {
+    const taggleInput = taggle.getInput();
+    
+    // 'awesomplete-highlight'イベントを監視
+    taggleInput.addEventListener('awesomplete-highlight', function(e) {
+      // 選択された候補で入力欄の値を置き換える
+      taggleInput.value = e.text.label;
+    });
+  
+    // 'awesomplete-selectcomplete'イベントを監視
+    taggleInput.addEventListener('awesomplete-selectcomplete', function(e) {
+      e.preventDefault();
+      taggle.add(taggleInput.value);
+      // タグを追加後、入力欄をクリア
+      taggleInput.value = '';
+    });
+  }
+  // タブキーでの移動にinput_taggleを含める
+  function handleTabKey(event) {
+    if (event.key === 'Tab') {
+      const focusableElements = Array.from(document.querySelectorAll('input, textarea, select, button'));
+      const taggleInput = document.querySelector('.taggle_input');
+  
+      const currentIndex = focusableElements.indexOf(document.activeElement);
+      let nextIndex;
+  
+      if (event.shiftKey) {
+        if (document.activeElement === taggleInput) {
+          nextIndex = focusableElements.indexOf(document.getElementById('enable-checkbox'));
+        } else {
+          nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+        }
+      } else {
+        if (document.activeElement === document.getElementById('enable-checkbox')) {
+          taggleInput.focus();
+          event.preventDefault();
+          return;
+        } else {
+          nextIndex = (currentIndex + 1) % focusableElements.length;
+        }
+      }
+  
+      focusableElements[nextIndex].focus();
+      event.preventDefault();
+    }
   }
 
   // イベントリスナーの登録
@@ -213,11 +319,29 @@ document.addEventListener('DOMContentLoaded', function() {
   promptTextInput.addEventListener('input', adjustTextareaHeight); // テキストエリアの内容が変更された時に高さを調整
   reorderButton.addEventListener('click', openReorderPage);
   window.addEventListener('resize', adjustTextareaHeight); // ウィンドウのリサイズ時にも高さを調整
+  document.addEventListener('keydown', handleTabKey);
 
   // 初期化処理
   loadPrompts().then(() => {
+    // URLパラメータから選択されたプロンプトを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedPromptFromPopup = urlParams.get('prompt');
+
+    if (selectedPromptFromPopup) {
+      // 選択されたプロンプトが存在する場合、それを選択する
+      promptSelectElement.value = decodeURIComponent(selectedPromptFromPopup);
+      // フォームを更新
+      updateForm();
+    } else {
     // フォームを更新
     promptSelectElement.dispatchEvent(new Event('change'));
+    }
+
+    chrome.storage.local.get('tags', function(data) {
+      const tags = data.tags || [];
+      awesomplete.list = tags;
+    });
+    linkTaggleAndAwesomplete();
   });
 });
 

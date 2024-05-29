@@ -102,5 +102,17 @@
   "saveOrder": {
     "message": "並び順を保存",
     "description": "並び順保存ボタンのテキスト"
+  },
+  "enable": {
+    "message": "有効",
+    "description": "有効チェックボックスのラベル"
+  },
+  "tags": {
+    "message": "タグ",
+    "description": "タグ入力のラベル"
+  },
+  "selectTag": {
+    "message": "タグを選択",
+    "description": "タグドロップダウンのデフォルトオプションテキスト"
   }
 }

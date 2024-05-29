@@ -102,5 +102,17 @@
   "saveOrder": {
     "message": "Save Order",
     "description": "Text for the save order button"
+  },
+  "enable": {
+    "message": "Enable",
+    "description": "Label for the enable checkbox"
+  },
+  "tags": {
+    "message": "Tags",
+    "description": "Label for the tags input"
+  },
+  "selectTag": {
+    "message": "Select Tag",
+    "description": "Default option text for the tag dropdown"
   }
 }

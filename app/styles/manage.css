@@ -61,16 +61,6 @@ body {
   color: #fff;
 }
 
-.prompt-form {
-  background-color: #fff;
-  border-radius: 4px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-}
-
 .prompt-form label {
   display: block;
   margin-bottom: 10px;
@@ -245,4 +235,59 @@ body {
   100% {
     width: 0;
   }
+}
+
+.prompt-name-container {
+  display: flex;
+  align-items: center;
+}
+
+.prompt-name-container input[type="text"] {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.prompt-name-container label {
+  margin-right: 5px;
+}
+
+#tag-input {
+  border-radius: 4px;
+  padding: 4px;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 36px;
+  background-color: white;
+  margin-bottom: 10px;
+}
+
+#tag-input:focus-within {
+  outline: 2px solid #3f51b5;
+}
+
+.taggle_input {
+    border: none !important;
+    outline: none !important;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.awesomplete > ul {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  margin-top: 4px;
+}
+
+.prompt-form {
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
