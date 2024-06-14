@@ -5,3 +5,4 @@ packages/
 /*.xml
 /*_xml.txt
 /*.xpi
+/node_modules
