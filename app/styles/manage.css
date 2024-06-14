@@ -63,7 +63,7 @@ body {
 
 .prompt-form label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   color: #333;
 }
 
@@ -143,7 +143,7 @@ body {
 
 .prompt-select label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   color: #333;
 }
 
@@ -237,9 +237,15 @@ body {
   }
 }
 
+.tag-label-container {
+  display: flex;
+  align-items: center;
+}
+
 .prompt-name-container {
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .prompt-name-container input[type="text"] {
@@ -247,8 +253,10 @@ body {
   margin-right: 10px;
 }
 
+.tag-label-container label,
 .prompt-name-container label {
   margin-right: 5px;
+  margin-bottom: 0; /* Updated margin-bottom to 0 */
 }
 
 #tag-input {
@@ -261,6 +269,7 @@ body {
   min-height: 36px;
   background-color: white;
   margin-bottom: 10px;
+  border: 1px solid #ccc; /* Updated border color to match textarea */
 }
 
 #tag-input:focus-within {
@@ -290,4 +299,10 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+}
+
+.all-tag-explanation {
+  font-size: 0.9em;
+  color: #666;
+  margin-left: 10px;
 }

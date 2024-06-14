@@ -114,5 +114,14 @@
   "selectTag": {
     "message": "タグを選択",
     "description": "タグドロップダウンのデフォルトオプションテキスト"
+  },
+  "returnManage": {
+    "message": "プロンプトの管理",
+    "description": "並べ替えページからプロンプト管理の画面に戻る"
+  },
+  "allTagExplanation": {
+    "message": "'all'タグが付いたアイテムは、ポップアップのドロップダウンに常に表示されます。",
+    "description": "'all'タグの特別な意味についての説明"
   }
 }
+

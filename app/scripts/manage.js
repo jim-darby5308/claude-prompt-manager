@@ -1,5 +1,7 @@
 import Taggle from 'taggle';
 import Awesomplete from 'awesomplete';
+import { applyPromptOrder } from './common.js';
+
 document.addEventListener('DOMContentLoaded', function() {
   const promptSelectElement = document.getElementById('prompt-select');
   const addPromptButton = document.getElementById('add-prompt-button');
@@ -19,7 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // タグ入力の初期化
   const taggle = new Taggle('tag-input', {
     duplicateTagClass: 'bounce',
-    additionalTagClasses: ['taggle-tag']
+    additionalTagClasses: ['taggle-tag'],
+    placeholder: ''
   });
   
   // オートコンプリートの初期化
@@ -95,19 +98,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const promptName = promptNameInput.value.trim();
     const promptText = promptTextInput.value.trim();
     const enable = enableInput.checked;
-    const tags = Array.from(taggle.getTagValues()); // タグを取得
+    const tags = Array.from(taggle.getTagValues());
+
     if (promptName && promptText) {
       chrome.storage.local.get(['prompts', 'tags'], function(data) {
         const prompts = data.prompts || [];
         const storedTags = data.tags || [];
         const index = prompts.findIndex(prompt => prompt.promptName === promptName);
+
         if (index !== -1) {
           prompts[index].promptValue = promptText;
           prompts[index].enable = enable;
           prompts[index].tags = tags;
         } else {
-          prompts.push({ promptName, promptValue: promptText, enable, tags });
+          const newPrompt = {
+            promptName,
+            promptValue: promptText,
+            enable,
+            tags,
+            usageCount: 0,
+            lastUsedAt: Date.now()
+          };
+          prompts.push(newPrompt);
         }
+        applyPromptOrder(prompts);
         const updatedTags = new Set([...storedTags, ...tags]);
         chrome.storage.local.set({ prompts, tags: Array.from(updatedTags) }, function() {
           // プロンプトリストを更新
@@ -124,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   }
+
 
   function showSaveNotification() {
     const notification = document.createElement('div');
@@ -191,43 +206,32 @@ document.addEventListener('DOMContentLoaded', function() {
       reader.onload = function() {
         try {
           const jsonData = JSON.parse(reader.result);
-          if (Array.isArray(jsonData)) {
-            // 新データ形式の場合
-            const importedPrompts = jsonData;
+          const now = Date.now();
+          const importedPrompts = jsonData.map(prompt => ({
+            promptName: prompt.promptName,
+            promptValue: prompt.promptValue,
+            tags: prompt.tags || [],
+            enable: prompt.enable !== false,
+            usageCount: prompt.usageCount || 0,
+            lastUsedAt: prompt.lastUsedAt || now
+          }));
+          chrome.storage.local.get('prompts', function(data) {
+            const prompts = data.prompts || [];
+            const mergedPrompts = [...prompts, ...importedPrompts];
+            const uniquePrompts = Array.from(new Set(mergedPrompts.map(p => p.promptName)))
+              .map(promptName => mergedPrompts.find(p => p.promptName === promptName));
+            applyPromptOrder(uniquePrompts);
             const importedTags = new Set();
-            importedPrompts.forEach(prompt => {
+            uniquePrompts.forEach(prompt => {
               if (Array.isArray(prompt.tags)) {
                 prompt.tags.forEach(tag => importedTags.add(tag));
               }
             });
-            chrome.storage.local.get(['prompts', 'tags'], function(data) {
-              const prompts = data.prompts || [];
-              const tags = data.tags || [];
-              const mergedPrompts = [...prompts, ...importedPrompts];
-              const mergedTags = Array.from(new Set([...tags, ...importedTags]));
-              chrome.storage.local.set({ prompts: mergedPrompts, tags: mergedTags }, function() {
-                loadPrompts();
-                awesomplete.list = mergedTags;
-              });
+            chrome.storage.local.set({ prompts: uniquePrompts, tags: importedTags }, function() {
+              loadPrompts();
+              awesomplete.list = importedTags;
             });
-          } else if (typeof jsonData === 'object') {
-            // 旧データ形式の場合
-            const importedPrompts = Object.entries(jsonData).map(([promptName, promptValue]) => ({ 
-              promptName, 
-              promptValue,
-              tags: [],
-              enable: true
-            }));
-            chrome.storage.local.get('prompts', function(data) {
-              const prompts = data.prompts || [];
-              const mergedPrompts = [...prompts, ...importedPrompts];
-              chrome.storage.local.set({ prompts: mergedPrompts }, function() {
-                loadPrompts();
-              });
-            });
-          } else {
-            console.error('Invalid JSON data format');
-          }
+          });
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }

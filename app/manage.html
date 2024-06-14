@@ -13,10 +13,10 @@
     <h1 class="title" data-i18n="manageTitle">Manage Prompts</h1>
     <div class="prompt-select">
       <label for="prompt-select" data-i18n="selectPrompt">Select Prompt:</label>
-    <div class="prompt-select-container">
-      <select id="prompt-select"></select>
-      <button id="add-prompt-button" class="add-prompt-button" data-i18n-title="addPrompt">+</button>
-    </div>
+      <div class="prompt-select-container">
+        <select id="prompt-select"></select>
+        <button id="add-prompt-button" class="add-prompt-button" data-i18n-title="addPrompt">+</button>
+      </div>
     </div>
     <form id="prompt-form" class="prompt-form">
       <label for="prompt-name" data-i18n="promptName">Prompt Name:</label>
@@ -25,7 +25,10 @@
         <label for="enable-checkbox" data-i18n="enable">Enable:</label>
         <input type="checkbox" id="enable-checkbox" name="enable-checkbox" tabindex="0" checked>
       </div>
-      <label for="tag-input" data-i18n="tags">Tags:</label>
+      <div class="tag-label-container">  
+        <label for="tag-input" data-i18n="tags">Tags:</label>
+        <span class="all-tag-explanation" data-i18n="allTagExplanation">Items with the 'all' tag will always be displayed in the prompt popup dropdown.</span>
+      </div>
       <div id="tag-input"></div>
       <label for="prompt-text" data-i18n="promptText">Prompt Text:</label>
       <textarea id="prompt-text" name="prompt-text" rows="4" required></textarea>

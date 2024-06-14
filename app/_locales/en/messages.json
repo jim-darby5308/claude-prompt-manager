@@ -114,5 +114,13 @@
   "selectTag": {
     "message": "Select Tag",
     "description": "Default option text for the tag dropdown"
+  },
+  "returnManage": {
+    "message": "Manage Prompt",
+    "description": "option text for Return Manage buttion"
+  },
+  "allTagExplanation": {
+    "message": "Items with the 'all' tag will always be displayed in the prompt popup dropdown.",
+    "description": "Explanation for the special meaning of the 'all' tag"
   }
 }

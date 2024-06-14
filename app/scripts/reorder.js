@@ -1,7 +1,9 @@
 import Sortable from 'sortablejs'
+
 document.addEventListener('DOMContentLoaded', function() {
   const promptList = document.getElementById('prompt-list');
   const closeButton = document.getElementById('close-button');
+  const manageButton = document.getElementById('manage-button');
 
   // Localize UI
   localizeUI();
@@ -26,12 +28,26 @@ document.addEventListener('DOMContentLoaded', function() {
       animation: 150,
       ghostClass: 'ghost',
       onEnd: function(evt) {
-        // Update the order of prompts in storage
-        const promptNames = Array.from(promptList.querySelectorAll('li')).map(li => li.getAttribute('data-prompt'));
+        const movedPromptName = evt.item.getAttribute('data-prompt');
+        const newIndex = evt.newIndex;
+        
         chrome.storage.local.get('prompts', function(data) {
           const prompts = data.prompts || [];
-          const updatedPrompts = promptNames.map(name => prompts.find(p => p.promptName === name));
-          chrome.storage.local.set({ prompts: updatedPrompts });
+          const movedPrompt = prompts.find(p => p.promptName === movedPromptName);
+          
+          if (newIndex > 0) {
+            const prevPrompt = prompts[newIndex - 1];
+            movedPrompt.usageCount = prevPrompt.usageCount;
+            movedPrompt.lastUsedAt = Date.now();
+          } else {
+            movedPrompt.usageCount = prompts[newIndex + 1].usageCount + 1;
+            movedPrompt.lastUsedAt = Date.now();
+          }
+  
+          prompts.splice(prompts.findIndex(p => p.promptName === movedPromptName), 1);
+          prompts.splice(newIndex, 0, movedPrompt);
+  
+          chrome.storage.local.set({ prompts: prompts });
         });
       }
     });
@@ -42,8 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
     window.close();
   }
 
+  // 管理ページに戻る関数
+  function managePage() {
+    chrome.tabs.create({ url: 'manage.html' }, function() {
+      window.close();
+    });
+  }
+
   // イベントリスナーの登録
   closeButton.addEventListener('click', closePage);
+  manageButton.addEventListener('click', managePage);
 
   // 初期化処理
   loadPrompts();
