@@ -2,7 +2,7 @@
   "name": "Claude Prompt Manager",
   "short_name": "ClaudePM",
   "description": "A browser extension to manage and apply prompts for Claude.",
-  "version": "1.2.2",
+  "version": "1.2.6",
   "manifest_version": 2,
   "default_locale": "en",
   "icons": {
@@ -29,7 +29,9 @@
     {
       "matches": [
         "https://claude.ai/chat/*",
-        "https://claude.ai/chats*"
+        "https://claude.ai/chats*",
+        "https://claude.ai/new*",
+        "https://claude.ai/project*"
       ],
       "js": [
         "scripts/contentscript.js"

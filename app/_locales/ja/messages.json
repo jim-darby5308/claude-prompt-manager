@@ -122,6 +122,10 @@
   "allTagExplanation": {
     "message": "'all'タグが付いたアイテムは、ポップアップのドロップダウンに常に表示されます。",
     "description": "'all'タグの特別な意味についての説明"
+  },
+  "filterPrompts": {
+    "message": "プロンプトを絞り込む:",
+    "description": "プロンプトフィルター入力のラベル"
   }
 }
 

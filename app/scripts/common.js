@@ -1,16 +1,12 @@
 // プロンプトの順番の変更
 function applyPromptOrder(prompts) {
   prompts.sort((a, b) => {
-    // 未使用1日経過で使用1回分スコアをマイナス
-    // 1000(msec) * 60(sec) * 60(min) * 24(h) * 1(day)
-    const msecDiviser = 86400000 
-    const now = Date.now();
-    const a_score = a.usageCount - (now - a.lastUsedAt) / msecDiviser;
-    const b_score = b.usageCount - (now - b.lastUsedAt) / msecDiviser;
-    if (a_score !== b_score) {
-      return b_score - a_score;
-    }
-    return prompts.indexOf(a) - prompts.indexOf(b);
+    // lastUsedAtが存在しない場合は、0（1970年1月1日）とする
+    const aLastUsed = a.lastUsedAt || 0;
+    const bLastUsed = b.lastUsedAt || 0;
+    
+    // 降順で並べ替え（最新のものが先頭に来るように）
+    return bLastUsed - aLastUsed;
   });
 }
 

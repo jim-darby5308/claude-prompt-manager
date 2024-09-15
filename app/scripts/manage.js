@@ -1,9 +1,11 @@
 import Taggle from 'taggle';
 import Awesomplete from 'awesomplete';
+import Fuse from 'fuse.js';
 import { applyPromptOrder } from './common.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-  const promptSelectElement = document.getElementById('prompt-select');
+  const promptFilterInput = document.getElementById('prompt-filter');
+  const promptDropdown = document.getElementById('prompt-dropdown');
   const addPromptButton = document.getElementById('add-prompt-button');
   const promptNameInput = document.getElementById('prompt-name');
   const promptTextInput = document.getElementById('prompt-text');
@@ -17,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const okButton = document.getElementById('ok-button');
   const cancelButton = document.getElementById('cancel-button');
   const enableInput = document.getElementById('enable-checkbox');
+
+  let prompts = [];
+  let fuse;
 
   // タグ入力の初期化
   const taggle = new Taggle('tag-input', {
@@ -39,26 +44,63 @@ document.addEventListener('DOMContentLoaded', function() {
     window.close();
   });
 
-  // ローカルストレージからプロンプトを読み込み、ドロップダウンリストに追加する関数
+  // ローカルストレージからプロンプトを読み込む関数
   function loadPrompts() {
     return new Promise((resolve) => {
-      while (promptSelectElement.firstChild) {
-        promptSelectElement.removeChild(promptSelectElement.firstChild);
-      }
       chrome.storage.local.get('prompts', function(data) {
-        const prompts = data.prompts || [];
-        prompts.forEach(function(prompt) {
-          const option = document.createElement('option');
-          option.value = prompt.promptName;
-          option.text = prompt.promptName;
-          promptSelectElement.appendChild(option);
+        prompts = data.prompts || [];
+        fuse = new Fuse(prompts, {
+          keys: ['promptName'],
+          threshold: 0.4,
+          ignoreLocation: true,
+          useExtendedSearch: true
         });
-        // プロンプトが選択された時の処理を追加
-        promptSelectElement.addEventListener('change', updateForm);
+        updateFilteredPrompts();
         resolve();
       });
     });
   }
+
+  // フィルタリングされたプロンプトを更新する関数
+  function updateFilteredPrompts() {
+    const filterText = promptFilterInput.value;
+    let filteredPrompts;
+
+    if (filterText.trim() === '') {
+      filteredPrompts = prompts;
+    } else {
+      filteredPrompts = fuse.search(filterText).map(result => result.item);
+    }
+
+    promptDropdown.innerHTML = '';
+    filteredPrompts.forEach(prompt => {
+      const option = document.createElement('div');
+      option.textContent = prompt.promptName;
+      option.classList.add('prompt-option');
+      option.addEventListener('click', () => selectPrompt(prompt));
+      promptDropdown.appendChild(option);
+    });
+
+    if (filteredPrompts.length > 0) {
+      promptDropdown.style.display = 'block';
+    } else {
+      promptDropdown.style.display = 'none';
+    }
+  }
+
+  // プロンプトを選択する関数
+  function selectPrompt(prompt) {
+    // 最新のプロンプトデータを使用
+    const latestPrompt = prompts.find(p => p.promptName === prompt.promptName) || prompt;
+    promptNameInput.value = latestPrompt.promptName;
+    promptTextInput.value = latestPrompt.promptValue;
+    enableInput.checked = latestPrompt.enable !== false;
+    updateTaggle(latestPrompt.tags || []);
+    adjustTextareaHeight();
+    promptDropdown.style.display = 'none';
+    promptFilterInput.value = '';
+  }
+
 
   // 新規プロンプトを追加する関数
   function addNewPrompt() {
@@ -66,31 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
     promptTextInput.value = '';
     promptNameInput.focus();
     enableInput.checked = true;
-    updateTaggle([]); // タグをクリア
-  }
-
-  // 選択されたプロンプトでフォームを更新する関数
-  function updateForm() {
-    const selectedPrompt = promptSelectElement.value;
-    if (selectedPrompt) {
-      chrome.storage.local.get('prompts', function(data) {
-        const prompts = data.prompts || [];
-        const selectedPromptData = prompts.find(prompt => prompt.promptName === selectedPrompt);
-        if (selectedPromptData) {
-          promptNameInput.value = selectedPromptData.promptName;
-          promptTextInput.value = selectedPromptData.promptValue;
-          enableInput.checked = selectedPromptData.enable !== false; // デフォルトはtrue
-          updateTaggle(selectedPromptData.tags || []); // タグを更新
-          adjustTextareaHeight();
-        }
-      });
-    } else {
-      promptNameInput.value = '';
-      promptTextInput.value = '';
-      enableInput.checked = true;
-      updateTaggle([]); // タグをクリア
-      adjustTextareaHeight();
-    }
+    updateTaggle([]);
+    promptFilterInput.value = '';
+    promptDropdown.style.display = 'none';
   }
 
   // プロンプトを保存する関数
@@ -99,46 +119,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const promptText = promptTextInput.value.trim();
     const enable = enableInput.checked;
     const tags = Array.from(taggle.getTagValues());
-
+  
     if (promptName && promptText) {
-      chrome.storage.local.get(['prompts', 'tags'], function(data) {
-        const prompts = data.prompts || [];
-        const storedTags = data.tags || [];
-        const index = prompts.findIndex(prompt => prompt.promptName === promptName);
+      const index = prompts.findIndex(prompt => prompt.promptName === promptName);
 
-        if (index !== -1) {
-          prompts[index].promptValue = promptText;
-          prompts[index].enable = enable;
-          prompts[index].tags = tags;
-        } else {
-          const newPrompt = {
-            promptName,
-            promptValue: promptText,
-            enable,
-            tags,
-            usageCount: 0,
-            lastUsedAt: Date.now()
-          };
-          prompts.push(newPrompt);
+      if (index !== -1) {
+        prompts[index].promptValue = promptText;
+        prompts[index].enable = enable;
+        prompts[index].tags = tags;
+        prompts[index].lastUsedAt = Date.now(); // 既存のプロンプトを更新した場合も lastUsedAt を更新
+      } else {
+        const newPrompt = {
+          promptName,
+          promptValue: promptText,
+          enable,
+          tags,
+          lastUsedAt: Date.now() // 新規プロンプト作成時に lastUsedAt を設定
+        };
+        prompts.push(newPrompt);
+      }
+      applyPromptOrder(prompts);
+
+      // すべてのプロンプトから使用されているタグを収集
+      const updatedTags = new Set(prompts.flatMap(prompt => prompt.tags));
+
+      chrome.storage.local.set({ prompts, tags: Array.from(updatedTags) }, function() {
+        // プロンプトリストを更新
+        updateFilteredPrompts();
+        
+        // 保存したプロンプトを選択
+        selectPrompt(prompts.find(p => p.promptName === promptName));
+        
+        // オートコンプリートの候補を更新
+        awesomplete.list = Array.from(updatedTags);
+        
+        // Fuse.jsのインスタンスを更新（もし使用している場合）
+        if (typeof fuse !== 'undefined') {
+          fuse.setCollection(prompts);
         }
-        applyPromptOrder(prompts);
-        const updatedTags = new Set([...storedTags, ...tags]);
-        chrome.storage.local.set({ prompts, tags: Array.from(updatedTags) }, function() {
-          // プロンプトリストを更新
-          loadPrompts().then(() => {
-            // 保存したプロンプトを選択
-            promptSelectElement.value = promptName;
-            // フォームを更新
-            promptSelectElement.dispatchEvent(new Event('change'));
-            // オートコンプリートの候補を更新
-            awesomplete.list = Array.from(updatedTags);
-            showSaveNotification();
-          });
-        });
+        
+        showSaveNotification();
       });
     }
   }
-
 
   function showSaveNotification() {
     const notification = document.createElement('div');
@@ -168,23 +191,19 @@ document.addEventListener('DOMContentLoaded', function() {
   function deletePrompt() {
     const promptName = promptNameInput.value.trim();
     if (promptName) {
-      chrome.storage.local.get('prompts', function(data) {
-        const prompts = data.prompts || [];
-        const updatedPrompts = prompts.filter(prompt => prompt.promptName !== promptName);
-        chrome.storage.local.set({ prompts: updatedPrompts }, function() {
+      prompts = prompts.filter(prompt => prompt.promptName !== promptName);
+      chrome.storage.local.set({ prompts }, function() {
           promptNameInput.value = '';
           promptTextInput.value = '';
-          loadPrompts();
+        fuse.setCollection(prompts);
+        updateFilteredPrompts();
           hideDeleteConfirmation();
         });
-      });
     }
   }
 
   // プロンプトをエクスポートする関数
   function exportPrompts() {
-    chrome.storage.local.get('prompts', function(data) {
-      const prompts = data.prompts || [];
       const jsonData = JSON.stringify(prompts, null, 2);
       const blob = new Blob([jsonData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -192,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
       a.href = url;
       a.download = 'prompts.json';
       a.click();
-    });
   }
   
   // プロンプトをインポートする関数
@@ -215,22 +233,16 @@ document.addEventListener('DOMContentLoaded', function() {
             usageCount: prompt.usageCount || 0,
             lastUsedAt: prompt.lastUsedAt || now
           }));
-          chrome.storage.local.get('prompts', function(data) {
-            const prompts = data.prompts || [];
-            const mergedPrompts = [...prompts, ...importedPrompts];
-            const uniquePrompts = Array.from(new Set(mergedPrompts.map(p => p.promptName)))
-              .map(promptName => mergedPrompts.find(p => p.promptName === promptName));
+          prompts = [...prompts, ...importedPrompts];
+          const uniquePrompts = Array.from(new Set(prompts.map(p => p.promptName)))
+            .map(promptName => prompts.find(p => p.promptName === promptName));
             applyPromptOrder(uniquePrompts);
-            const importedTags = new Set();
-            uniquePrompts.forEach(prompt => {
-              if (Array.isArray(prompt.tags)) {
-                prompt.tags.forEach(tag => importedTags.add(tag));
-              }
-            });
-            chrome.storage.local.set({ prompts: uniquePrompts, tags: importedTags }, function() {
-              loadPrompts();
-              awesomplete.list = importedTags;
-            });
+          const importedTags = new Set(uniquePrompts.flatMap(prompt => prompt.tags));
+          chrome.storage.local.set({ prompts: uniquePrompts, tags: Array.from(importedTags) }, function() {
+            prompts = uniquePrompts;
+            fuse.setCollection(prompts);
+            updateFilteredPrompts();
+            awesomplete.list = Array.from(importedTags);
           });
         } catch (error) {
           console.error('Error parsing JSON:', error);
@@ -241,14 +253,14 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.click();
   }
 
-  // プロンプトの並べ替えページを開くボタン
+  // プロンプトの並べ替えページを開く関数
   function openReorderPage() {
     chrome.tabs.create({ url: 'reorder.html' }, function() {
       window.close();
     });
   }
 
-  // テキストエリアの高さを調整する関数を追加
+  // テキストエリアの高さを調整する関数
   function adjustTextareaHeight() {
     promptTextInput.style.height = 'auto';
     const textareaRect = promptTextInput.getBoundingClientRect();
@@ -268,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
   function linkTaggleAndAwesomplete() {
     const taggleInput = taggle.getInput();
     
-    // 'awesomplete-highlight'イベントを監視
     taggleInput.addEventListener('awesomplete-highlight', function(e) {
       // 選択された候補で入力欄の値を置き換える
       taggleInput.value = e.text.label;
@@ -282,10 +293,11 @@ document.addEventListener('DOMContentLoaded', function() {
       taggleInput.value = '';
     });
   }
+
   // タブキーでの移動にinput_taggleを含める
   function handleTabKey(event) {
     if (event.key === 'Tab') {
-      const focusableElements = Array.from(document.querySelectorAll('input, textarea, select, button'));
+      const focusableElements = Array.from(document.querySelectorAll('input, textarea, select, button, .prompt-option'));
       const taggleInput = document.querySelector('.taggle_input');
   
       const currentIndex = focusableElements.indexOf(document.activeElement);
@@ -313,6 +325,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // イベントリスナーの登録
+  promptFilterInput.addEventListener('input', updateFilteredPrompts);
+  promptFilterInput.addEventListener('focus', () => {
+    if (promptFilterInput.value === '') {
+      updateFilteredPrompts();
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (!promptDropdown.contains(e.target) && e.target !== promptFilterInput) {
+      promptDropdown.style.display = 'none';
+    }
+  });
   addPromptButton.addEventListener('click', addNewPrompt);
   saveButton.addEventListener('click', savePrompt);
   deleteButton.addEventListener('click', showDeleteConfirmation);
@@ -326,27 +349,29 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('keydown', handleTabKey);
 
   // 初期化処理
-  loadPrompts().then(() => {
-    // URLパラメータから選択されたプロンプトを取得
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedPromptFromPopup = urlParams.get('prompt');
+  function initialize() {
+    loadPrompts().then(() => {
+      // URLパラメータから選択されたプロンプトを取得
+      const urlParams = new URLSearchParams(window.location.search);
+      const selectedPromptFromPopup = urlParams.get('prompt');
 
-    if (selectedPromptFromPopup) {
-      // 選択されたプロンプトが存在する場合、それを選択する
-      promptSelectElement.value = decodeURIComponent(selectedPromptFromPopup);
-      // フォームを更新
-      updateForm();
-    } else {
-    // フォームを更新
-    promptSelectElement.dispatchEvent(new Event('change'));
-    }
+      if (selectedPromptFromPopup) {
+        // 選択されたプロンプトが存在する場合、それを選択する
+        const selectedPrompt = prompts.find(p => p.promptName === decodeURIComponent(selectedPromptFromPopup));
+        if (selectedPrompt) {
+          selectPrompt(selectedPrompt);
+        }
+      }
 
-    chrome.storage.local.get('tags', function(data) {
-      const tags = data.tags || [];
-      awesomplete.list = tags;
+      chrome.storage.local.get('tags', function(data) {
+        const tags = data.tags || [];
+        awesomplete.list = tags;
+      });
+      linkTaggleAndAwesomplete();
     });
-    linkTaggleAndAwesomplete();
-  });
+  }
+
+  initialize();
 });
 
 function localizeUI() {

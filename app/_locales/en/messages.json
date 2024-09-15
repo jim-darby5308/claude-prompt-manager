@@ -122,5 +122,9 @@
   "allTagExplanation": {
     "message": "Items with the 'all' tag will always be displayed in the prompt popup dropdown.",
     "description": "Explanation for the special meaning of the 'all' tag"
+  },
+  "filterPrompts": {
+    "message": "Filter Prompts:",
+    "description": "Label for the prompt filter input"
   }
 }
