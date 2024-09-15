@@ -87,21 +87,9 @@
     "message": "キャンセル",
     "description": "キャンセルボタンのテキスト"
   },
-    "addPrompt": {
+  "addPrompt": {
     "message": "プロンプトを追加",
     "description": "プロンプト追加ボタンのタイトル"
-  },
-    "reorderPrompts": {
-    "message": "プロンプトの並び替え",
-    "description": "プロンプト並び替えボタンのテキスト"
-  },
-  "reorderTitle": {
-    "message": "プロンプトの並び替え",
-    "description": "プロンプト並び替えページのタイトル"
-  },
-  "saveOrder": {
-    "message": "並び順を保存",
-    "description": "並び順保存ボタンのテキスト"
   },
   "enable": {
     "message": "有効",
@@ -128,4 +116,3 @@
     "description": "プロンプトフィルター入力のラベル"
   }
 }
-

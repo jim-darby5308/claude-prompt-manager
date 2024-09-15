@@ -1,6 +1,6 @@
 {
   "name": "Claude-Prompt-Manager",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A browser extension to manage and apply prompts for Claude.",
   "scripts": {
     "dev": "NODE_OPTIONS='--openssl-legacy-provider' webextension-toolbox dev",
@@ -13,7 +13,6 @@
   "dependencies": {
     "@mui/material": "^5.11.13",
     "awesomplete": "^1.1.5",
-    "sortablejs": "^1.15.2",
     "taggle": "^1.15.0",
     "fuse.js": "^6.6.2"
   }

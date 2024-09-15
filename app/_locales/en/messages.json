@@ -91,18 +91,6 @@
     "message": "Add Prompt",
     "description": "Title for the add prompt button"
   },
-  "reorderPrompts": {
-    "message": "Reorder Prompts",
-    "description": "Text for the reorder prompts button"
-  },
-  "reorderTitle": {
-    "message": "Reorder Prompts",
-    "description": "Title for the reorder prompts page"
-  },
-  "saveOrder": {
-    "message": "Save Order",
-    "description": "Text for the save order button"
-  },
   "enable": {
     "message": "Enable",
     "description": "Label for the enable checkbox"

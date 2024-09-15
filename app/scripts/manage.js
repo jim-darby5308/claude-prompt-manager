@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const promptTextInput = document.getElementById('prompt-text');
   const saveButton = document.getElementById('save-button');
   const deleteButton = document.getElementById('delete-button');
-  const reorderButton = document.getElementById('reorder-button');
   const importButton = document.getElementById('import-button');
   const exportButton = document.getElementById('export-button');
   const closeButton = document.getElementById('close-button');
@@ -253,13 +252,6 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.click();
   }
 
-  // プロンプトの並べ替えページを開く関数
-  function openReorderPage() {
-    chrome.tabs.create({ url: 'reorder.html' }, function() {
-      window.close();
-    });
-  }
-
   // テキストエリアの高さを調整する関数
   function adjustTextareaHeight() {
     promptTextInput.style.height = 'auto';
@@ -344,7 +336,6 @@ document.addEventListener('DOMContentLoaded', function() {
   importButton.addEventListener('click', importPrompts);
   exportButton.addEventListener('click', exportPrompts);
   promptTextInput.addEventListener('input', adjustTextareaHeight); // テキストエリアの内容が変更された時に高さを調整
-  reorderButton.addEventListener('click', openReorderPage);
   window.addEventListener('resize', adjustTextareaHeight); // ウィンドウのリサイズ時にも高さを調整
   document.addEventListener('keydown', handleTabKey);
 
